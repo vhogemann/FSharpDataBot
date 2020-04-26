@@ -14,6 +14,27 @@ open FSharp.Data
 // 2010 - 2020
 
 
+let shrink width values =
+    let ratio = float ( Array.length values ) / float width
+    
+    let merge ratio values =
+        let rec groupRec ratio values acc =
+            match ratio with
+            | r when r < 1.0 -> acc @ [( Seq.tryHead values, r )]
+            | r -> groupRec (r - 1.0) (Seq.tail values) (acc @ [(Seq.tryHead values, r)])
+    
+        let combine = function
+            | (None, _) -> 0.0
+            | (Some value, ratio) -> value * ratio
+
+        let sum = groupRec ratio values [] |> Seq.map combine |> Seq.sum
+        
+        sum / ratio
+    
+
+
+    merge ratio values   
+
 let graphBar height value =
     let rec bar index (acc:string list) value =
         match index, value with
