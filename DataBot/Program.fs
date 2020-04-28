@@ -31,6 +31,8 @@ let shrink width values =
         
         sum / ratio
     
+    let shrinkRec width values acc =
+        ignore
 
 
     merge ratio values   
