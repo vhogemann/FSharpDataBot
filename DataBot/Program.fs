@@ -1,51 +1,44 @@
-﻿// Learn more about F# at http://fsharp.org
-
-open System
+﻿open System
 open FSharp.Data
-// Brasil - GDP
-// ________________________ -
-// __**____________________
-// _*__*___________________
-// *____*__________________
-// ________________________
-// __**____________________
-// _*__*___________________
-// *____*__________________
-// 2010 - 2020
 
 
-let shrink width values =
-    let ratio = float ( Array.length values ) / float width
-    
-    let merge ratio values =
-        let rec groupRec ratio values acc =
-            match ratio with
-            | r when r < 1.0 -> acc @ [( Seq.tryHead values, r )]
-            | r -> groupRec (r - 1.0) (Seq.tail values) (acc @ [(Seq.tryHead values, r)])
-    
-        let combine = function
-            | (None, _) -> 0.0
-            | (Some value, ratio) -> value * ratio
+let shrink (width:int) (values: float list) =
+    let length = values.Length
 
-        let sum = groupRec ratio values [] |> Seq.map combine |> Seq.sum
-        
-        sum / ratio
-    
-    let shrinkRec width values acc =
-        ignore
+    let ratio = (float length) / (float width) |> Math.Ceiling |> Convert.ToInt32
+
+    let fractional = (length % width) > 0
 
 
-    merge ratio values   
+    let rec shrinkRec ratio fractional values (acc: float list list) =
+        match values with
+        | [] -> acc
+        | _ ->
+            let cols =
+                if (values.Length < ratio ) then values.Length else ratio
+            let columns = values |> List.take cols
 
-let graphBar height value =
+            let skip = 
+                if fractional && (cols - 1) > 0 then
+                    cols - 1
+                else
+                    cols
+
+            shrinkRec ratio fractional (values |> List.skip skip) (acc @ [columns])
+
+
+    shrinkRec ratio fractional values []
+    |> List.map(List.average)
+   
+
+let plotColumn height value =
     let rec bar index (acc:string list) value =
         match index, value with
         | i, _ when i >= height -> acc
         | i, v when i = v -> bar (index+1) (acc @ ["*"]) value
-        | _, _ -> bar (index + 1) (acc @ [" "]) value
+        | _, _ -> bar (index + 1) (acc @ ["-"]) value
 
     bar 0 [] value
-
 
 let numberFormat = function
     | x when x < 10.0 ** 3.0 -> string x
@@ -55,8 +48,8 @@ let numberFormat = function
     | x when x < 10.0 ** 15.0 -> sprintf "%.1fT" (x/10.0 ** 12.0)
     | x -> sprintf "%.2G" x
 
-let buildGraph (height:int) (indicator:Runtime.WorldBank.Indicator) =
-    let width = (indicator |> Seq.length)
+let buildGraph (height:int) (width:int) (indicator:Runtime.WorldBank.Indicator) =
+
     let (_, max) =
         indicator
         |> Seq.maxBy (fun (_, value) -> value)
@@ -65,7 +58,7 @@ let buildGraph (height:int) (indicator:Runtime.WorldBank.Indicator) =
     
     let barFun value =
         let index = (value / scale |> Convert.ToInt32) - 1   
-        graphBar height index |> List.toArray
+        plotColumn height index |> List.toArray
 
     let scales = 
         seq { for i in 0 .. (height-1) do yield float(i) * scale }
@@ -74,10 +67,13 @@ let buildGraph (height:int) (indicator:Runtime.WorldBank.Indicator) =
     
     let tmp =
         indicator
-        |> Seq.map ( fun (_, v) -> barFun v)
+        |> Seq.map ( fun (_, v) -> v)
+        |> Seq.toList |> shrink width
+        |> Seq.map barFun
         |> Seq.toArray
 
     let values = [|scales|] |> Array.append tmp
+    let width = (tmp |> Seq.length)
 
     Array2D.init (width + 1) height (fun x y -> values.[x].[(height - 1) - y])
  
@@ -92,10 +88,10 @@ let main argv =
             .Brazil
             .Indicators
             .``GDP (constant 2010 US$)``
-           
-    
-    let graph = indicator |> buildGraph 8
-    
+
+
+    let graph = indicator |> buildGraph 5 24
+     
     let width = (Array2D.length1 graph) - 1
     let heigh = (Array2D.length2 graph) - 1
 
