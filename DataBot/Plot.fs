@@ -120,6 +120,7 @@ let Line (width:int) (height:int) (command:GraphCommand) =
             match command.Year with
             | [] -> None
             | years -> years |> List.max |> Some
+
         match yearMin, yearMax with
         | Some min, Some max when min < max ->
             Seq.filter (fun (y, _) -> y >= min && y <= max )
@@ -128,7 +129,7 @@ let Line (width:int) (height:int) (command:GraphCommand) =
     let generateLabel (country:Data.ICountry) (indicator:Runtime.WorldBank.Indicator) : string =
         let startYear, endYear =
             let years = indicator |> Seq.map( fun (year,_) -> year)
-            years |> Seq.max, years |> Seq.min
+            years |> Seq.min, years |> Seq.max
         let flagEmoji = country.FlagEmoji
         let indicatorName = indicator.Name
         sprintf "%s %i-%i %s" flagEmoji startYear endYear indicatorName
