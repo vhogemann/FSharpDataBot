@@ -1,5 +1,8 @@
 ﻿module Plot
+open Command
 open System
+open System.Text
+open FSharp.Data
 
 let private stretch (width:int) (values: float list) =
     let length = values.Length
@@ -88,10 +91,7 @@ let line (width:int) (height:int) (indicator:(int*float)seq) =
         |> Seq.map barFun
     [scales] |> Seq.append tmp |> Seq.transpose
 
-//let Line (command:Command.GraphCommand) = ()
-
-open System.Text
-let AsString (data: string seq seq) =
+let graphToString (data: string seq seq) =
     let foldFun (acc:StringBuilder) (row:string seq) =
         let rowString = row |> String.concat ""
         acc.Append(rowString).Append("\n")
@@ -99,4 +99,45 @@ let AsString (data: string seq seq) =
         data
         |> Seq.fold foldFun (new StringBuilder())
     fold.ToString()
+
+
+let Line (width:int) (height:int) (command:GraphCommand) =
+    let getIndicator (country:Data.ICountry) (indicator:IndicatorType) : Runtime.WorldBank.Indicator =
+        match indicator with
+        | IndicatorType.Gdp -> country.GetGdp()
+        | IndicatorType.GdpGrowth -> country.GetGdpGrowth()
+        | IndicatorType.GdpPerCapita -> country.GetGdpPerCapita()
+        | IndicatorType.AdultLiteracy -> country.GetAdultLiteracy()
+        | IndicatorType.YoungLiteracy -> country.GetYouthLiteracy()
+        | IndicatorType.Unenployment -> country.GetUnenployment()
+
+    let periodFilter =
+        let yearMin =
+            match command.Year with
+            | [] -> None
+            | years -> years |> List.min |> Some
+        let yearMax =
+            match command.Year with
+            | [] -> None
+            | years -> years |> List.max |> Some
+        match yearMin, yearMax with
+        | Some min, Some max when min < max ->
+            Seq.filter (fun (y, _) -> y >= min && y <= max )
+        | _ -> id     
+
+    let generateLabel (country:Data.ICountry) (indicator:Runtime.WorldBank.Indicator) : string =
+        let startYear, endYear =
+            let years = indicator |> Seq.map( fun (year,_) -> year)
+            years |> Seq.max, years |> Seq.min
+        let flagEmoji = country.FlagEmoji
+        let indicatorName = indicator.Name
+        sprintf "%s %i-%i %s" flagEmoji startYear endYear indicatorName
+
+    seq { for country in command.Country do
+            for indicatorCmd in command.Indicator do
+                let indicator = getIndicator country indicatorCmd
+                let data = indicator |> periodFilter
+                let label = generateLabel country indicator
+                let graph = line width height data |> graphToString
+                yield sprintf "%s\n%s" graph label }
    

@@ -18,6 +18,7 @@ type ICountry =
     inherit IEconomy
     inherit ISocial
     inherit IComparable
+    abstract member FlagEmoji : string with get
     abstract member Inner: WorldBankData.ServiceTypes.Country with get
 
 let compareTo (country:WorldBankData.ServiceTypes.Country) (obj:Object) =
@@ -36,6 +37,7 @@ let Brazil =
         member __.GetUnenployment() = country.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)`` 
         member __.GetYouthLiteracy() = country.Indicators.``Literacy rate, youth total (% of people ages 15-24)``
         member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``
+        member __.FlagEmoji with get() = "";
         member __.Inner with get() = country
         member __.CompareTo(obj) = compareTo country obj }
 
@@ -48,6 +50,7 @@ let Argentina =
         member __.GetUnenployment() = country.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)`` 
         member __.GetYouthLiteracy() = country.Indicators.``Literacy rate, youth total (% of people ages 15-24)``
         member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``
+        member __.FlagEmoji with get() = "";
         member __.Inner with get() = country
         member __.CompareTo(obj) = compareTo country obj }
 
@@ -60,6 +63,7 @@ let USA =
         member __.GetUnenployment() = country.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)``
         member __.GetYouthLiteracy() = country.Indicators.``Literacy rate, youth total (% of people ages 15-24)``
         member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``
+        member __.FlagEmoji with get() = "";
         member __.Inner with get() = country
         member __.CompareTo(obj) = compareTo country obj }
 
@@ -72,5 +76,6 @@ let China =
         member __.GetUnenployment() = country.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)``
         member __.GetYouthLiteracy() = country.Indicators.``Literacy rate, youth total (% of people ages 15-24)``
         member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)`` 
+        member __.FlagEmoji with get() = "";
         member __.Inner with get() = country
         member __.CompareTo(obj) = compareTo country obj }

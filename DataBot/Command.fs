@@ -84,37 +84,3 @@ let Parse (commandLine:string) : GraphCommand =
 
     tokens
     |> List.fold folder { Country = []; Indicator = []; Year = [] }
-    
-let Execute (command:GraphCommand) =
-    let execute (country:ICountry) indicator yearMin yearMax =
-        let data =
-            match indicator with
-            | IndicatorType.Gdp -> country.GetGdp()
-            | IndicatorType.GdpGrowth -> country.GetGdpGrowth()
-            | IndicatorType.GdpPerCapita -> country.GetGdpPerCapita()
-            | IndicatorType.AdultLiteracy -> country.GetAdultLiteracy()
-            | IndicatorType.YoungLiteracy -> country.GetYouthLiteracy()
-            | IndicatorType.Unenployment -> country.GetUnenployment()
-        
-        let periodFilter =
-            match yearMin, yearMax with
-            | Some min, Some max when min < max ->
-                Seq.filter (fun (y, _) -> y >= min && y <= max )
-            | _ -> id
-
-        data
-        |> periodFilter
-    let maybeStartYear =
-        match command.Year with
-        | [] -> None
-        | years -> years |> List.min |> Some
-    let maybeEndYear =
-        match command.Year with
-        | [] -> None
-        | years -> years |> List.max |> Some
-    
-    seq { 
-        for country in command.Country do
-            for indicator in command.Indicator do
-                yield execute country indicator maybeStartYear maybeEndYear
-    }
