@@ -9,6 +9,8 @@ let (|Regex|_|) pattern input =
     if m.Success then Some(List.tail [ for g in m.Groups -> g.Value ])
     else None
 
+[<StructuralComparison>]
+[<StructuralEquality>]
 type IndicatorType =
     | Gdp
     | GdpPerCapita
@@ -17,6 +19,8 @@ type IndicatorType =
     | YoungLiteracy
     | AdultLiteracy
 
+[<StructuralComparison>]
+[<StructuralEquality>]
 type Token = 
     | Country of country : ICountry
     | Year of year : int
@@ -68,8 +72,8 @@ let private parse (tokens: string list) =
     parseRec tokens []
 
 let Parse (commandLine:string) : GraphCommand = 
-    let args = commandLine.Split(" ") |> Array.toList
-    let tokens = parse(args)
+    let args = commandLine.Split(" ") |> Set.ofArray |> Set.toList
+    let tokens = parse(args) |> Set.ofList |> Set.toList
     
     let folder (state: GraphCommand) (token:Token) =
         match token with
@@ -100,9 +104,6 @@ let Execute (command:GraphCommand) =
 
         data
         |> periodFilter
-        |> Plot.Line 14 7
-        |> Plot.AsString
-
     let maybeStartYear =
         match command.Year with
         | [] -> None

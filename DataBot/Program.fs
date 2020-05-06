@@ -5,11 +5,11 @@ open System
 let main argv =
 
     let result =
-        "brazil usa gdp per capita 2000 2020"
+        "brazil gdp per capita 2000 2020"
         |> Command.Parse
         |> Command.Execute
+        |> Seq.map (Plot.Line 14 7 >> Plot.AsString)
         |> Seq.toList
-    
     result    
     |> Seq.iter ( fun s -> printfn "%s" s )
 

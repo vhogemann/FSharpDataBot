@@ -17,6 +17,15 @@ type ISocial =
 type ICountry =
     inherit IEconomy
     inherit ISocial
+    inherit IComparable
+    abstract member Inner: WorldBankData.ServiceTypes.Country with get
+
+let compareTo (country:WorldBankData.ServiceTypes.Country) (obj:Object) =
+    if obj :? ICountry then
+        let countryObj = obj :?> ICountry
+        country.Code.CompareTo( countryObj.Inner.Code )
+    else
+        -1
 
 let Brazil =
     let country = data.Countries.Brazil
@@ -27,7 +36,8 @@ let Brazil =
         member __.GetUnenployment() = country.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)`` 
         member __.GetYouthLiteracy() = country.Indicators.``Literacy rate, youth total (% of people ages 15-24)``
         member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``
-  }
+        member __.Inner with get() = country
+        member __.CompareTo(obj) = compareTo country obj }
 
 let Argentina =
     let country = data.Countries.Argentina
@@ -37,7 +47,9 @@ let Argentina =
         member __.GetGdpGrowth() = country.Indicators.``GDP growth (annual %)``
         member __.GetUnenployment() = country.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)`` 
         member __.GetYouthLiteracy() = country.Indicators.``Literacy rate, youth total (% of people ages 15-24)``
-        member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``}
+        member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``
+        member __.Inner with get() = country
+        member __.CompareTo(obj) = compareTo country obj }
 
 let USA =
     let country = data.Countries.``United States``
@@ -47,7 +59,9 @@ let USA =
         member __.GetGdpGrowth() = country.Indicators.``GDP growth (annual %)``
         member __.GetUnenployment() = country.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)``
         member __.GetYouthLiteracy() = country.Indicators.``Literacy rate, youth total (% of people ages 15-24)``
-        member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``}
+        member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``
+        member __.Inner with get() = country
+        member __.CompareTo(obj) = compareTo country obj }
 
 let China =
     let country = data.Countries.China
@@ -57,4 +71,6 @@ let China =
         member __.GetGdpGrowth() = country.Indicators.``GDP growth (annual %)``
         member __.GetUnenployment() = country.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)``
         member __.GetYouthLiteracy() = country.Indicators.``Literacy rate, youth total (% of people ages 15-24)``
-        member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)`` }
+        member __.GetAdultLiteracy() = country.Indicators.``Literacy rate, adult total (% of people ages 15 and above)`` 
+        member __.Inner with get() = country
+        member __.CompareTo(obj) = compareTo country obj }
