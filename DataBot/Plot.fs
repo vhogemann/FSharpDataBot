@@ -64,7 +64,7 @@ let private numberFormat = function
     | x when x < 10.0 ** 15.0 -> sprintf "%.1fT" (x/10.0 ** 12.0)
     | x -> sprintf "%.1f" x
 
-let Line (width:int) (height:int) (indicator:(int*float)seq) =
+let line (width:int) (height:int) (indicator:(int*float)seq) =
     let (_, max) =
         indicator
         |> Seq.maxBy (fun (_, value) -> value)
@@ -87,6 +87,8 @@ let Line (width:int) (height:int) (indicator:(int*float)seq) =
         |> Seq.toList |> resize width
         |> Seq.map barFun
     [scales] |> Seq.append tmp |> Seq.transpose
+
+//let Line (command:Command.GraphCommand) = ()
 
 open System.Text
 let AsString (data: string seq seq) =
