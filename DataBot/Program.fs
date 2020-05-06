@@ -3,14 +3,14 @@ open System
 
 [<EntryPoint>]
 let main argv =
-    let indicator = 
-        Data.Brazil.GetGdpGrowth()
 
-    let graph = 
-        indicator 
-        |> Plot.Line 14 7
-        |> Plot.AsString
-
-    printfn "%s" graph
+    let result =
+        "brazil usa gdp per capita 2000 2020"
+        |> Command.Parse
+        |> Command.Execute
+        |> Seq.toList
+    
+    result    
+    |> Seq.iter ( fun s -> printfn "%s" s )
 
     0 // return an integer exit code
