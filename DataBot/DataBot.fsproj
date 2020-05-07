@@ -7,9 +7,11 @@
     <Compile Include="Data.fs" />
     <Compile Include="Command.fs" />
     <Compile Include="Plot.fs" />
+    <Compile Include="Twitter.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CoreTweet" Version="1.0.0.483" />
     <PackageReference Include="FSharp.Data" Version="3.3.3" />
   </ItemGroup>
   <ItemGroup>
