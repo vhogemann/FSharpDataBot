@@ -43,15 +43,15 @@ let private extract = function
         Country(Data.Brazil), t
     | "argentina" :: t | "arg" :: t | "ar" :: t -> 
         Country(Data.Argentina), t
-    | "usa" :: t | "us" :: t | "eua" :: t | "estados" :: "unidos" :: t | "united" :: "states" :: t -> 
+    | "usa" :: t | "us" :: t | "eua" :: t -> 
         Country(Data.USA), t
     | "china" :: t | "cn" :: t | "chn" :: t -> 
         Country(Data.China), t
 
     // Indicators
-    | "gdp" :: "growth" :: t | "crescimento" :: "do" :: "pib" :: t | "crescimento" :: "da" :: "economia" :: t ->
+    | "gdp" :: "growth" :: t ->
         Indicator(GdpGrowth), t
-    | "gdp" :: "per" :: "capita" :: t | "pib" :: "per" :: "capita" :: t -> 
+    | "gdp/capita" :: t | "pib/capita" :: t -> 
         Indicator(GdpPerCapita), t 
     | "gdp" :: t | "pib" :: t -> 
         Indicator(Gdp), t
