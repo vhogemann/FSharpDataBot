@@ -4,13 +4,30 @@ open Tweetinvi
 open Tweetinvi.Models
 open Tweetinvi.Parameters
 
-type FeedReader() = 
+let getEnv = Environment.GetEnvironmentVariable
+
+let twitterApiKey = 
+    "TWITTER_API_KEY" |> getEnv
+let twitterApiSecretKey = 
+    "TWITTER_API_SECRET_KEY" |> getEnv
+let twitterAccessToken = 
+    "TWITTER_ACCESS_TOKEN" |> getEnv
+let twitterAccessTokenSecret = 
+    "TWITTER_ACCESS_TOKEN_SECRET" |> getEnv
+let lockFilePath = 
+    "FS_DATA_BOT_LAST_REPLY" |> getEnv
+
+type ReplyCache() =
+    member __.GetLastReply():int64 = 1L
+    member __.SetLastReply(messageId:int64) = ()
+
+type FeedReader() =
     do 
         Auth.SetUserCredentials(
-            "",
-            "",
-            "",
-            "") |> ignore
+            twitterApiKey,
+            twitterApiSecretKey,
+            twitterAccessToken,
+            twitterAccessTokenSecret) |> ignore
         TweetinviConfig.CurrentThreadSettings.TweetMode <- TweetMode.Extended
     let botUser = User.GetAuthenticatedUser().ScreenName
 
