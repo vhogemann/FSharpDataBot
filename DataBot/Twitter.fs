@@ -10,7 +10,10 @@ type FeedReader() =
         return! twitter.Statuses.MentionsTimelineAsync() |> Async.AwaitTask
     }
 
-    let reply(tweetId:Nullable<int64>, reply: string list) = async {
+    let reply(tweetId:Nullable<int64>, replies: string list) = async {
+        match replies with
+        | [] -> return ()
+        | reply :: tail ->
         return! twitter.Statuses.UpdateAsync("", tweetId) |> Async.AwaitTask
     }
 
