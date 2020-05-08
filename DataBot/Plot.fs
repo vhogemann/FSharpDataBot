@@ -97,9 +97,8 @@ let graphToString (data: string seq seq) =
         acc.Append(rowString).Append("\n")
     let fold =
         data
-        |> Seq.fold foldFun (new StringBuilder())
+        |> Seq.fold foldFun (StringBuilder())
     fold.ToString()
-
 
 let Line (width:int) (height:int) (command:GraphCommand) =
     let getIndicator (country:Data.ICountry) (indicator:IndicatorType) : Runtime.WorldBank.Indicator =
