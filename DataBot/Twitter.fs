@@ -1,24 +1,28 @@
 ﻿module Twitter
 open System
-open CoreTweet
-type FeedReader() =
-    let rnd = Random()
-    let twitter = 
-        Tokens.Create(
-            "brUhckoCTFQZhA9TfwBSKScXR",
-            "HfbIFtoPMZHGtlrHxUiLQJ72wljPXXAUgP4JotRNYt7kGM5blZ",
-            "1258776964963332096-Pjwy8v76pAmVe65vqjzwR9pyIr9lnA",
-            "9aopKNDx0Rak9LHZhENjXbovCw3EuCf9QScvJHVIGkFvv")
+open Tweetinvi
+open Tweetinvi.Models
+open Tweetinvi.Parameters
 
-    let rec postReply (tweetId:int64) (replies:string list) = async {
+type FeedReader() = 
+    do 
+        Auth.SetUserCredentials(
+            "",
+            "",
+            "",
+            "") |> ignore
+        TweetinviConfig.CurrentThreadSettings.TweetMode <- TweetMode.Extended
+    let botUser = User.GetAuthenticatedUser().ScreenName
+
+    let rec postReply (userHandle:string) (tweetId:int64) (replies:string list) = async {
         match replies with
         | [] -> return ()
         | status :: tail ->
-            let! response = twitter.Statuses.UpdateAsync(status, Nullable(tweetId)) |> Async.AwaitTask
-            return! postReply (response.Id) tail
+            let! response = TweetAsync.PublishTweetInReplyTo(sprintf "@%s\n%s" userHandle status , tweetId) |>Async.AwaitTask
+            return! postReply botUser (response.Id) tail
     }
 
-    let reply (mentions: Status seq) = 
+    let reply (mentions: IMention seq) = 
             mentions
             |> Seq.filter (fun mention -> not (isNull mention.Text))
             |> Seq.map (fun mention ->
@@ -27,14 +31,15 @@ type FeedReader() =
                     |> Command.Parse
                     |> Plot.Line 10 5
                     |> Seq.toList
-                postReply mention.Id replies
+                postReply mention.CreatedBy.ScreenName mention.Id replies
             )
             |> Async.Parallel
             |> Async.Ignore
 
     member __.Start () = async {
             printfn "fetching tweets"
-            let! mentions = twitter.Statuses.MentionsTimelineAsync(10) |> Async.AwaitTask
-            if not(isNull mentions) then do! reply mentions
-            //do! Async.Sleep 10000
+            let parameters = MentionsTimelineParameters()
+            parameters.SinceId <- 10L
+            let mentions = Timeline.GetMentionsTimeline()
+            if not(isNull mentions) then do! reply mentions            //do! Async.Sleep 10000
     }

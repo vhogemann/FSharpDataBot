@@ -11,8 +11,8 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CoreTweet" Version="1.0.0.483" />
     <PackageReference Include="FSharp.Data" Version="3.3.3" />
+    <PackageReference Include="TweetinviAPI" Version="4.0.3" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Update="FSharp.Core" Version="4.7.1" />
