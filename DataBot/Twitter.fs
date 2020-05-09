@@ -18,8 +18,9 @@ let lockFilePath =
     "FS_DATA_BOT_LAST_REPLY" |> getEnv
 
 type ReplyCache() =
-    member __.GetLastReply():int64 = 1L
-    member __.SetLastReply(messageId:int64) = ()
+    let mutable lastReply = 0L
+    member __.GetLastReply():int64 = lastReply
+    member __.SetLastReply(messageId:int64) = lastReply <- messageId
 
 type FeedReader() =
     do 
@@ -30,6 +31,7 @@ type FeedReader() =
             twitterAccessTokenSecret) |> ignore
         TweetinviConfig.CurrentThreadSettings.TweetMode <- TweetMode.Extended
     let botUser = User.GetAuthenticatedUser().ScreenName
+    let cache = ReplyCache()
 
     let rec postReply (userHandle:string) (tweetId:int64) (replies:string list) = async {
         match replies with
@@ -46,7 +48,7 @@ type FeedReader() =
                 let replies = 
                     mention.Text
                     |> Command.Parse
-                    |> Plot.Line 10 5
+                    |> Plot.Line 14 7
                     |> Seq.toList
                 postReply mention.CreatedBy.ScreenName mention.Id replies
             )
@@ -58,5 +60,6 @@ type FeedReader() =
             let parameters = MentionsTimelineParameters()
             parameters.SinceId <- 10L
             let mentions = Timeline.GetMentionsTimeline()
-            if not(isNull mentions) then do! reply mentions            //do! Async.Sleep 10000
+            let last = mentions |> Seq.last
+            if not(isNull mentions) then do! reply mentions
     }
