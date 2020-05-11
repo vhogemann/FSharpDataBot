@@ -48,7 +48,7 @@ type FeedReader() =
                 let replies = 
                     mention.Text
                     |> Command.Parse
-                    |> Plot.Line 14 7
+                    |> Plot.Line 20 7
                     |> Seq.toList
                 postReply mention.CreatedBy.ScreenName mention.Id replies
             )

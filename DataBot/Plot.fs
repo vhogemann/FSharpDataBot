@@ -54,8 +54,8 @@ let private plotColumn height value =
     let rec bar index (acc:string list) value =
         match index, value with
         | i, _ when i >= height -> acc
-        | i, v when i = v -> bar (index+1) (acc @ ["🔴"]) value
-        | _, _ -> bar (index + 1) (acc @ ["⬜"]) value
+        | i, v when i = v -> bar (index+1) (acc @ ["*"]) value
+        | _, _ -> bar (index + 1) (acc @ ["_"]) value
 
     bar 0 [] value
 
