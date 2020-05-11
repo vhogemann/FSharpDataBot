@@ -5,7 +5,6 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="FSharp.Charting.fs" />
     <Compile Include="Data.fs" />
     <Compile Include="Command.fs" />
     <Compile Include="Plot.fs" />
