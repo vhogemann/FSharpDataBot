@@ -1,33 +1,28 @@
 ﻿module App
 open System
-open System.Windows.Forms.DataVisualization.Charting
+open ZedGraph
+open System.Drawing
+open System.Drawing.Imaging
+
+
 
 [<EntryPoint>]
 let main argv =
 
     let data = Data.Brazil.GetGdp()
-
-    let chart = new Chart();
-    chart.Palette <- ChartColorPalette.EarthTones
-    
-    let series = chart.Series.Add "TEST"
-    
-    series.ChartType <- SeriesChartType.Spline
-    
+    let points = PointPairList()
     for (year, value) in data do
-        series.Points.AddXY(string year, value) |> ignore
-    
-    let ca = new ChartArea()
-    ca.AxisX <- new Axis()
-    ca.AxisY <- new Axis()
+        points.Add(float year, value)
 
-    ca.BorderDashStyle <- ChartDashStyle.Solid
+    let pane = new GraphPane()
+    pane.AddCurve("Test", points, Color.Blue, SymbolType.Diamond) |> ignore
+    let bmp = new Bitmap(10,10)
+    let g = Graphics.FromImage(bmp);
+    pane.AxisChange(g)
 
-    chart.ChartAreas.Add ca
+    let image = pane.GetImage()
 
-    chart.SaveImage("test.png", Drawing.Imaging.ImageFormat.Png)
-
-
+    image.Save("test.png", ImageFormat.Png)
 
     0
 
