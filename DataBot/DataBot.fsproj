@@ -5,19 +5,18 @@
     <UseWindowsForms>true</UseWindowsForms>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Update="FSharp.Core" Version="4.7.1" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="Data.fs" />
     <Compile Include="Command.fs" />
+    <Compile Include="Graph.fs" />
     <Compile Include="Plot.fs" />
     <Compile Include="Twitter.fs" />
     <Compile Include="Program.fs" />
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="FSharp.Data" Version="3.3.3" />
     <PackageReference Include="System.Data.Common" Version="4.3.0" />
     <PackageReference Include="TweetinviAPI" Version="4.0.3" />
     <PackageReference Include="ZedGraph" Version="6.0.0-alpha0001" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="FSharp.Core" Version="4.7.1" />
   </ItemGroup>
 </Project>

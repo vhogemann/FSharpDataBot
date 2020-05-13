@@ -33,11 +33,11 @@ type FeedReader() =
     let botUser = User.GetAuthenticatedUser().ScreenName
     let cache = ReplyCache()
 
-    let rec postReply (userHandle:string) (tweetId:int64) (replies:string list) = async {
+    let rec postReply (userHandle:string) (tweetId:int64) (replies:Drawing.Bitmap list) = async {
         match replies with
         | [] -> return ()
         | status :: tail ->
-            let! response = TweetAsync.PublishTweetInReplyTo(sprintf "@%s\n%s" userHandle status , tweetId) |>Async.AwaitTask
+            let! response = TweetAsync.PublishTweetInReplyTo(sprintf "@%s" userHandle , tweetId) |>Async.AwaitTask
             return! postReply botUser (response.Id) tail
     }
 
@@ -45,11 +45,20 @@ type FeedReader() =
             mentions
             |> Seq.filter (fun mention -> not (isNull mention.Text))
             |> Seq.map (fun mention ->
+                let command = mention.Text |> Command.Parse
                 let replies = 
-                    mention.Text
-                    |> Command.Parse
-                    |> Plot.Line 20 7
-                    |> Seq.toList
+                    seq { 
+                        for indicator in command.Indicator do
+                            let startYear =
+                                match command.Year with
+                                | [] -> None
+                                | years -> years |> List.min |> Some
+                            let endYear =
+                                match command.Year with
+                                | [] -> None
+                                | years -> years |> List.max |> Some
+                            yield Graph.Line startYear endYear indicator (command.Country)
+                    } |> Seq.toList
                 postReply mention.CreatedBy.ScreenName mention.Id replies
             )
             |> Async.Parallel
