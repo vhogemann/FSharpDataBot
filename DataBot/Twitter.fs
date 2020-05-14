@@ -1,5 +1,6 @@
 ﻿module Twitter
 open System
+open System.IO
 open Tweetinvi
 open Tweetinvi.Models
 open Tweetinvi.Parameters
@@ -37,7 +38,13 @@ type FeedReader() =
         match replies with
         | [] -> return ()
         | status :: tail ->
-            let! response = TweetAsync.PublishTweetInReplyTo(sprintf "@%s" userHandle , tweetId) |>Async.AwaitTask
+            use stream = new MemoryStream()
+            status.Save(stream, Drawing.Imaging.ImageFormat.Png)
+            let media = ResizeArray [ Upload.UploadBinary(stream.ToArray()) ]
+            let options = PublishTweetOptionalParameters()
+            options.Medias <- media
+            options.InReplyToTweetId <- Nullable(tweetId)
+            let! response = TweetAsync.PublishTweet(sprintf "@%s" userHandle , options) |>Async.AwaitTask
             return! postReply botUser (response.Id) tail
     }
 
