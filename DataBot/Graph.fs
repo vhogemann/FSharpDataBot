@@ -12,6 +12,7 @@ let createPane (title: string) =
     pane.Title.Text <- title
     pane.XAxis.Scale.MinGrace <- 0.0
     pane.XAxis.Scale.MaxGrace <- 0.0
+    pane
 
 let pointList (startDate:int option) (endDate:int option) (indicator:Indicator) = 
     let points = PointPairList()
@@ -46,11 +47,15 @@ let toIndicator (country:Data.ICountry) (indicator:IndicatorType)   : Indicator 
     | IndicatorType.Unenployment -> country.GetUnenployment()
 
 let Line (startDate:int option) (endDate:int option) (indicatorType:IndicatorType) (countries:Data.ICountry seq):Bitmap =
-    let pane = GraphPane()
+    let title =
+        let indicator = toIndicator (countries |> Seq.head) indicatorType
+        indicator.Name
+    let pane = createPane(title)    
     let addLine = addLineToPane startDate endDate pane
     for country in countries do
         indicatorType |> toIndicator country |> addLine
-    use bmp = new Bitmap(1200, 675)
+    use bmp = new Bitmap(10, 10)
     use graph = Graphics.FromImage(bmp)
     pane.AxisChange(graph)
+    graph.Dispose()
     pane.GetImage()
