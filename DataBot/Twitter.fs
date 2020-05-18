@@ -1,6 +1,7 @@
 ﻿module Twitter
 open System
 open System.IO
+open MentionsRepository
 open Tweetinvi
 open Tweetinvi.Models
 open Tweetinvi.Parameters
@@ -18,11 +19,6 @@ let twitterAccessTokenSecret =
 let lockFilePath = 
     "FS_DATA_BOT_LAST_REPLY" |> getEnv
 
-type ReplyCache() =
-    let mutable lastReply = 0L
-    member __.GetLastReply():int64 = lastReply
-    member __.SetLastReply(messageId:int64) = lastReply <- messageId
-
 type FeedReader() =
     do 
         Auth.SetUserCredentials(
@@ -32,14 +28,11 @@ type FeedReader() =
             twitterAccessTokenSecret) |> ignore
         TweetinviConfig.CurrentThreadSettings.TweetMode <- TweetMode.Extended
     let botUser = User.GetAuthenticatedUser().ScreenName
-    let cache = ReplyCache()
 
-    let rec postReply (userHandle:string) (tweetId:int64) (replies:Drawing.Bitmap list) = async {
+    let rec postReply (userHandle:string) (tweetId:int64) (replies:MemoryStream list) = async {
         match replies with
         | [] -> return ()
-        | status :: tail ->
-            use stream = new MemoryStream()
-            status.Save(stream, Drawing.Imaging.ImageFormat.Png)
+        | stream :: tail ->
             let media = ResizeArray [ Upload.UploadBinary(stream.ToArray()) ]
             let options = PublishTweetOptionalParameters()
             options.Medias <- media
@@ -52,19 +45,11 @@ type FeedReader() =
             mentions
             |> Seq.filter (fun mention -> not (isNull mention.Text))
             |> Seq.map (fun mention ->
-                let command = mention.Text |> Command.Parse
+                let commands = mention.Text |> Command.Parse
                 let replies = 
                     seq { 
-                        for indicator in command.Indicator do
-                            let startYear =
-                                match command.Year with
-                                | [] -> None
-                                | years -> years |> List.min |> Some
-                            let endYear =
-                                match command.Year with
-                                | [] -> None
-                                | years -> years |> List.max |> Some
-                            yield Graph.Line startYear endYear indicator (command.Country)
+                        for command in commands do
+                            yield Graph.Line command
                     } |> Seq.toList
                 postReply mention.CreatedBy.ScreenName mention.Id replies
             )
@@ -73,9 +58,19 @@ type FeedReader() =
 
     member __.Start () = async {
             printfn "fetching tweets"
-            let parameters = MentionsTimelineParameters()
-            parameters.SinceId <- 10L
-            let mentions = Timeline.GetMentionsTimeline()
-            let last = mentions |> Seq.last
-            if not(isNull mentions) then do! reply mentions
+            let mayBeLastMention = GetLatestMention() |> Seq.tryHead
+            let mentions = 
+                match mayBeLastMention with
+                | Some mention -> 
+                    let parameters = MentionsTimelineParameters()
+                    parameters.SinceId <- mention.Id
+                    parameters.MaximumNumberOfTweetsToRetrieve <- 100
+                    Timeline.GetMentionsTimeline(parameters)
+                | None -> Timeline.GetMentionsTimeline()
+            if not(isNull mentions) then do!
+                mentions
+                |> Seq.map (fun mention -> { Id = mention.Id; TimeStamp = mention.CreatedAt })
+                |> SaveMentions
+                |> ignore
+                reply mentions
     }

@@ -31,10 +31,17 @@ type GraphPeriod =
     | Year of year:int
     | Period of int * int
 
-type GraphCommand = {
+type FoldState = {
     Country: ICountry list
     Indicator: IndicatorType list
     Year: int list
+}
+
+type Command = {
+    Countries: ICountry list
+    Indicator: IndicatorType
+    StartYear: int option
+    EndYear: int option
 }
 
 let private extract = function
@@ -71,16 +78,31 @@ let private parse (tokens: string list) =
         | (token, tail) -> parseRec tail acc @ [token]
     parseRec tokens []
 
-let Parse (commandLine:string) : GraphCommand = 
+let Parse (commandLine:string) : Command list = 
     let args = commandLine.Split(" ") |> Set.ofArray |> Set.toList
     let tokens = parse(args) |> Set.ofList |> Set.toList
     
-    let folder (state: GraphCommand) (token:Token) =
+    let folder (state: FoldState) (token:Token) =
         match token with
         | Token.Country c ->  { state with Country = state.Country @ [c]  }
         | Token.Indicator i -> { state with Indicator = state.Indicator @ [i] }
         | Token.Year y -> { state with Year = state.Year @ [y] }
         | _ -> state
 
-    tokens
-    |> List.fold folder { Country = []; Indicator = []; Year = [] }
+    let state = 
+        tokens
+        |> List.fold folder { Country = []; Indicator = []; Year = [] }
+    
+    let startYear =
+        match state.Year with
+        | [] -> None
+        | years -> years |> List.min |> Some
+    let endYear =
+        match state.Year with
+        | [] -> None
+        | years -> years |> List.max |> Some
+
+    seq {
+        for indicator in state.Indicator do
+            yield { Countries = state.Country; Indicator = indicator; StartYear = startYear; EndYear = endYear }
+    } |> Seq.toList

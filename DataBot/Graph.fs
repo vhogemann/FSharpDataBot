@@ -1,6 +1,8 @@
 module Graph
 open Command
 open ZedGraph
+open System
+open System.IO
 open System.Drawing
 open FSharp.Data
 
@@ -46,16 +48,24 @@ let toIndicator (country:Data.ICountry) (indicator:IndicatorType)   : Indicator 
     | IndicatorType.YoungLiteracy -> country.GetYouthLiteracy()
     | IndicatorType.Unenployment -> country.GetUnenployment()
 
-let Line (startDate:int option) (endDate:int option) (indicatorType:IndicatorType) (countries:Data.ICountry seq):Bitmap =
-    let title =
-        let indicator = toIndicator (countries |> Seq.head) indicatorType
+let Line (command:Command):MemoryStream =
+    let title = 
+        let indicator = toIndicator (command.Countries |> Seq.head ) command.Indicator
         indicator.Name
-    let pane = createPane(title)    
-    let addLine = addLineToPane startDate endDate pane
-    for country in countries do
-        indicatorType |> toIndicator country |> addLine
-    use bmp = new Bitmap(10, 10)
-    use graph = Graphics.FromImage(bmp)
+    
+    let pane = createPane(title)
+    let addLine = addLineToPane (command.StartYear) (command.EndYear) pane
+
+    for country in command.Countries do
+        command.Indicator |> toIndicator country |> addLine
+    
+    use graph = Graphics.FromImage(new Bitmap(1200, 675))
     pane.AxisChange(graph)
     graph.Dispose()
-    pane.GetImage()
+    use bmp = pane.GetImage()
+    use stream = new MemoryStream()
+    bmp.Save(stream, Imaging.ImageFormat.Png)
+    stream
+
+
+      
