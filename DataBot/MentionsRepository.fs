@@ -16,6 +16,7 @@ type MentionContext () =
         optionsBuilder.UseSqlite("Data Source=mentions.db") |> ignore
 
 let db = new MentionContext()
+db.Database.EnsureCreated() |> ignore
 
 let SaveMentions mentions =
     for mention in mentions do

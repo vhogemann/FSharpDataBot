@@ -45,6 +45,7 @@ type FeedReader() =
             mentions
             |> Seq.filter (fun mention -> not (isNull mention.Text))
             |> Seq.map (fun mention ->
+                printfn "replying to: %s" mention.Text
                 let commands = mention.Text |> Command.Parse
                 let replies = 
                     seq { 
@@ -56,21 +57,27 @@ type FeedReader() =
             |> Async.Parallel
             |> Async.Ignore
 
+    let start () = async {
+        printfn "fetching tweets"
+        let mayBeLastMention = GetLatestMention() |> Seq.tryHead
+        let mentions = 
+            match mayBeLastMention with
+            | Some mention -> 
+                let parameters = MentionsTimelineParameters()
+                parameters.SinceId <- mention.Id
+                parameters.MaximumNumberOfTweetsToRetrieve <- 100
+                Timeline.GetMentionsTimeline(parameters)
+            | None -> Timeline.GetMentionsTimeline()
+        if not(isNull mentions) then do!
+            mentions
+            |> Seq.map (fun mention -> { Id = mention.Id; TimeStamp = mention.CreatedAt })
+            |> SaveMentions
+            |> ignore
+            reply mentions
+    }
+
     member __.Start () = async {
-            printfn "fetching tweets"
-            let mayBeLastMention = GetLatestMention() |> Seq.tryHead
-            let mentions = 
-                match mayBeLastMention with
-                | Some mention -> 
-                    let parameters = MentionsTimelineParameters()
-                    parameters.SinceId <- mention.Id
-                    parameters.MaximumNumberOfTweetsToRetrieve <- 100
-                    Timeline.GetMentionsTimeline(parameters)
-                | None -> Timeline.GetMentionsTimeline()
-            if not(isNull mentions) then do!
-                mentions
-                |> Seq.map (fun mention -> { Id = mention.Id; TimeStamp = mention.CreatedAt })
-                |> SaveMentions
-                |> ignore
-                reply mentions
+            while true do
+                do! start()
+                do! Async.Sleep (1000 * 60)
     }

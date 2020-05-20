@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30011.22
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DataBot", "DataBot\DataBot.fsproj", "{8ADDD216-0BC7-407F-A9D9-3E36E05A74A7}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DataBot", "DataBot\DataBot.fsproj", "{8ADDD216-0BC7-407F-A9D9-3E36E05A74A7}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Tests", "Tests\Tests.fsproj", "{9677EA27-717A-4A58-9233-00EC84A5D0A0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{8ADDD216-0BC7-407F-A9D9-3E36E05A74A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8ADDD216-0BC7-407F-A9D9-3E36E05A74A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8ADDD216-0BC7-407F-A9D9-3E36E05A74A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9677EA27-717A-4A58-9233-00EC84A5D0A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9677EA27-717A-4A58-9233-00EC84A5D0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9677EA27-717A-4A58-9233-00EC84A5D0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9677EA27-717A-4A58-9233-00EC84A5D0A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

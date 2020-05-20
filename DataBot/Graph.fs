@@ -39,25 +39,16 @@ let addLineToPane  (startDate:int option) (endDate:int option) (pane:GraphPane) 
     curve.Line.Width <- 3.0f
     ()
 
-let toIndicator (country:Data.ICountry) (indicator:IndicatorType)   : Indicator =
-    match indicator with
-    | IndicatorType.Gdp -> country.GetGdp()
-    | IndicatorType.GdpGrowth -> country.GetGdpGrowth()
-    | IndicatorType.GdpPerCapita -> country.GetGdpPerCapita()
-    | IndicatorType.AdultLiteracy -> country.GetAdultLiteracy()
-    | IndicatorType.YoungLiteracy -> country.GetYouthLiteracy()
-    | IndicatorType.Unenployment -> country.GetUnenployment()
-
 let Line (command:Command):MemoryStream =
     let title = 
-        let indicator = toIndicator (command.Countries |> Seq.head ) command.Indicator
+        let indicator = command.Indicator (command.Countries |> Seq.head)
         indicator.Name
     
     let pane = createPane(title)
     let addLine = addLineToPane (command.StartYear) (command.EndYear) pane
 
     for country in command.Countries do
-        command.Indicator |> toIndicator country |> addLine
+        command.Indicator country |> addLine
     
     use graph = Graphics.FromImage(new Bitmap(1200, 675))
     pane.AxisChange(graph)
