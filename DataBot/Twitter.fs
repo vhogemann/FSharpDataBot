@@ -46,13 +46,18 @@ type FeedReader() =
             |> Seq.filter (fun mention -> not (isNull mention.Text))
             |> Seq.map (fun mention ->
                 printfn "replying to: %s" mention.Text
-                let commands = mention.Text |> Command.Parse
-                let replies = 
-                    seq { 
-                        for command in commands do
-                            yield Graph.Line command
-                    } |> Seq.toList
-                postReply mention.CreatedBy.ScreenName mention.Id replies
+                let commands = mention.Text.ToLowerInvariant() |> Command.Parse
+                try
+                    let replies = 
+                        seq { 
+                            for command in commands do
+                                yield Graph.Line command
+                        } |> Seq.toList
+                    postReply mention.CreatedBy.ScreenName mention.Id replies
+                with
+                | exn -> 
+                    printfn "Error posting reply %A" exn
+                    Async.Sleep 0
             )
             |> Async.Parallel
             |> Async.Ignore
