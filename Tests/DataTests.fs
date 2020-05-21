@@ -1,7 +1,6 @@
-module Tests
+module DataTests
 
 open Data
-open System
 open Xunit
 open Swensen.Unquote
 

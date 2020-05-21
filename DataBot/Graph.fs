@@ -8,6 +8,17 @@ open FSharp.Data
 
 type Indicator = Runtime.WorldBank.Indicator
 
+let stringToColorHex (str:string):string =
+    if( String.IsNullOrEmpty str ) then
+        "#eeeeee"
+    else
+        let hash = str.GetHashCode() &&& 0x00FFFFFF
+        sprintf "#%X" hash
+
+let StringToColor (str:string):Color = 
+    str |> stringToColorHex |> ColorTranslator.FromHtml
+    
+
 let createPane (title: string) =
     let pane = GraphPane()
     pane.Rect <- RectangleF(0.0f, 0.0f, 1200.0f, 675.0f)
@@ -33,7 +44,8 @@ let pointList (startDate:int option) (endDate:int option) (indicator:Indicator) 
 
 let addLineToPane  (startDate:int option) (endDate:int option) (pane:GraphPane) (indicator:Indicator)  =
     let points = pointList startDate endDate indicator
-    let curve = pane.AddCurve(indicator.Code, points, Color.Blue, SymbolType.None)
+    let color = indicator.Code |> StringToColor
+    let curve = pane.AddCurve(indicator.Code, points, color, SymbolType.None)
     curve.Line.IsSmooth <- true
     curve.Line.IsAntiAlias <- true
     curve.Line.Width <- 3.0f
