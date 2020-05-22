@@ -4,31 +4,24 @@ open FSharp.Data
 open System.Globalization
 open System.Text.RegularExpressions
 
-
-
 let private data = WorldBankData.GetDataContext()
 let private _c = data.Countries
 
 type WBCountry = WorldBankData.ServiceTypes.Country
 type WBIndicator = Runtime.WorldBank.Indicator
 
-let regions = 
-    CultureInfo.GetCultures(CultureTypes.SpecificCultures)
-    |> Array.map (fun culture -> RegionInfo(culture.LCID))
-
 let (|CoutryMatcher|_|) (key:string) =
     let maybeRegion = 
-        regions 
-        |> Array.tryFind (fun region -> 
-            region.ThreeLetterISORegionName.ToLowerInvariant().Equals(key) 
-            || region.ThreeLetterWindowsRegionName.ToLowerInvariant().Equals(key)
-            || region.TwoLetterISORegionName.ToLowerInvariant().Equals(key)
-            || region.DisplayName.ToLowerInvariant().Equals(key)
+        Countries.List 
+        |> List.tryFind (fun region -> 
+            region.Name = key
+            || region.ThreeLetterCode = key
+            || region.TwoLetterCode = key
         )
     
     match maybeRegion with
     | Some region ->
-        _c |> Seq.tryFind (fun country -> country.Name.Equals(region.DisplayName)) 
+        _c |> Seq.tryFind (fun country -> country.Code = region.ThreeLetterCode.ToUpper()) 
     | _ -> None
     
 

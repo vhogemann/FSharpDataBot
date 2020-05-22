@@ -6,6 +6,7 @@ open Swensen.Unquote
 
 [<Fact>]
 let ``Country Matcher`` () =
+
     test 
         <@ 
             match "bra" with
@@ -13,13 +14,16 @@ let ``Country Matcher`` () =
                 country.Name = "Brazil"
             | _ -> false
         @>
-
+    
+    let maybeUsa =
+        match "united states" with
+            | CoutryMatcher country ->
+                Some country;
+            | _ -> None
+    
     test 
         <@ 
-            match "usa" with
-            | CoutryMatcher country ->
-                country.Name = "United States"
-            | _ -> false
+            maybeUsa.IsSome            
         @>
 
 [<Fact>]
