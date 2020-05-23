@@ -2,7 +2,9 @@
 
 open Data
 
-type IndicatorFun = WBCountry -> WBIndicator
+type IndicatorFun = 
+| WB of (WBCountry -> WBIndicator)
+| Covid of (string->Async<CovidProvider.CovidIndicator>)
 
 type Token =
 | Country of WBCountry
@@ -18,19 +20,21 @@ type FoldState = {
 
 type Command = {
     Countries : WBCountry list
-    Indicator : IndicatorFun
+    Indicator : IndicatorFun 
     StartYear : int option
     EndYear : int option
 }
 
 let parse (token:string) = 
     match token with
-    | IndicatorMatcher indicator -> 
-        Token.Indicator indicator 
+    | IndicatorMatcher indicator ->
+        Token.Indicator (WB indicator) 
     | CoutryMatcher country -> 
         Token.Country country
     | YearMatcher year -> 
         Token.Year year
+    | CovidMatcher covid ->
+        Token.Indicator (Covid covid)
     | _ -> 
         Token.Unknown
 

@@ -7,6 +7,7 @@ open System.Drawing
 open FSharp.Data
 
 type Indicator = Runtime.WorldBank.Indicator
+type ValueSeq<'X,'Y> = ('X*'Y) seq
 
 let stringToColorHex (str:string):string =
     if( String.IsNullOrEmpty str ) then
@@ -27,41 +28,31 @@ let createPane (title: string) =
     pane.XAxis.Scale.MaxGrace <- 0.0
     pane
 
-let pointList (startDate:int option) (endDate:int option) (indicator:Indicator) = 
+let pointList (startDate:int option) (endDate:int option) indicator = 
     let points = PointPairList()
     
     let dateFilter = 
         match startDate, endDate with
-        | Some sd, Some ed -> fun (year, _) -> year >= sd && year <= ed
-        | Some sd, None -> fun (year, _) -> year >= sd
-        | None, Some ed -> fun (year, _) -> year <= ed
+        | Some sd, Some ed -> fun (year, _) -> year >= double sd && year <= double ed
+        | Some sd, None -> fun (year, _) -> year >= double sd
+        | None, Some ed -> fun (year, _) -> year <= double ed
         | None, None -> fun (_) -> true
 
     for (year, value) in (indicator |> Seq.filter dateFilter ) do
-        points.Add(float year, value)
+        points.Add(year, value)
     
     points
 
-let addLineToPane  (startDate:int option) (endDate:int option) (pane:GraphPane) (indicator:Indicator)  =
+let addLineToPane  (startDate:int option) (endDate:int option) (pane:GraphPane) code indicator  =
     let points = pointList startDate endDate indicator
-    let color = indicator.Code |> StringToColor
-    let curve = pane.AddCurve(indicator.Code, points, color, SymbolType.None)
+    let color = code |> StringToColor
+    let curve = pane.AddCurve(code, points, color, SymbolType.None)
     curve.Line.IsSmooth <- true
     curve.Line.IsAntiAlias <- true
     curve.Line.Width <- 3.0f
     ()
 
-let Line (command:Command):MemoryStream =
-    let title = 
-        let indicator = command.Indicator (command.Countries |> Seq.head)
-        indicator.Name
-    
-    let pane = createPane(title)
-    let addLine = addLineToPane (command.StartYear) (command.EndYear) pane
-
-    for country in command.Countries do
-        command.Indicator country |> addLine
-    
+let paneToStream (pane:GraphPane) =
     use graph = Graphics.FromImage(new Bitmap(1200, 675))
     pane.AxisChange(graph)
     graph.Dispose()
@@ -69,6 +60,14 @@ let Line (command:Command):MemoryStream =
     use stream = new MemoryStream()
     bmp.Save(stream, Imaging.ImageFormat.Png)
     stream
+
+let Line title indicators =
+    let pane = createPane(title)
+    let addLine = addLineToPane None None pane
+    for legend, indicator in indicators do
+        addLine legend indicator
+    pane |> paneToStream
+
 
 
       

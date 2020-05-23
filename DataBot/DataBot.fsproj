@@ -13,12 +13,13 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.0" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="covidsample.json" />
+    <Compile Include="CovidProvider.fs" />
     <Compile Include="MentionsRepository.fs" />
     <Compile Include="Countries.fs" />
     <Compile Include="Data.fs" />
     <Compile Include="Command.fs" />
     <Compile Include="Graph.fs" />
-    <Compile Include="Plot.fs" />
     <Compile Include="Twitter.fs" />
     <Compile Include="Program.fs" />
     <PackageReference Include="FSharp.Data" Version="3.3.3" />

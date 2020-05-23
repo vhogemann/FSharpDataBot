@@ -25,6 +25,11 @@ let (|CoutryMatcher|_|) (key:string) =
     | _ -> None
     
 
+let (|CovidMatcher|_|) (key: string) =
+    match key with
+    | "covid" -> Some (fun country -> CovidProvider.AsyncFetch country "deaths")
+    |_ -> None
+
 let (|IndicatorMatcher|_|) (key: string) =
     match key with
     | "gdp" -> 
@@ -39,6 +44,8 @@ let (|IndicatorMatcher|_|) (key: string) =
         Some (fun (c:WBCountry) -> c.Indicators.``Employers, total (% of total employment) (modeled ILO estimate)``)
     | "unenployment" -> 
         Some (fun (c:WBCountry) -> c.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)``)
+    | "electricity-access" ->
+        Some (fun (c:WBCountry) -> c.Indicators.``Access to electricity (% of population)``)
     |_ -> None
 
 let (|YearMatcher|_|) (token:string) =
