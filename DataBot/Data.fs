@@ -1,7 +1,6 @@
 ﻿module Data
 open System
 open FSharp.Data
-open System.Globalization
 open System.Text.RegularExpressions
 
 let private data = WorldBankData.GetDataContext()
@@ -11,23 +10,21 @@ type WBCountry = WorldBankData.ServiceTypes.Country
 type WBIndicator = Runtime.WorldBank.Indicator
 
 let (|CoutryMatcher|_|) (key:string) =
-    let maybeRegion = 
-        Countries.List 
-        |> List.tryFind (fun region -> 
-            region.Name = key
-            || region.ThreeLetterCode = key
-            || region.TwoLetterCode = key
-        )
-    
-    match maybeRegion with
-    | Some region ->
-        _c |> Seq.tryFind (fun country -> country.Code = region.ThreeLetterCode.ToUpper()) 
-    | _ -> None
+    Countries.List 
+    |> List.tryFind (fun region -> 
+        region.Name = key
+        || region.ThreeLetterCode = key
+        || region.TwoLetterCode = key
+    )
+
+let toWBCountry (region:Countries.Country) =
+    _c |> Seq.tryFind (fun country -> country.Code = region.ThreeLetterCode.ToUpper()) 
     
 
 let (|CovidMatcher|_|) (key: string) =
     match key with
-    | "covid" -> Some (fun country -> CovidProvider.AsyncFetch country "deaths")
+    | "covid" -> Some (fun (country:Countries.Country) -> 
+        CovidProvider.AsyncFetch (country.TwoLetterCode) (country.ThreeLetterCode.ToUpper()))
     |_ -> None
 
 let (|IndicatorMatcher|_|) (key: string) =

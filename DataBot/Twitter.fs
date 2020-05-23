@@ -33,16 +33,61 @@ type FeedReader() =
         TweetinviConfig.CurrentThreadSettings.TweetMode <- TweetMode.Extended
     let botUser = User.GetAuthenticatedUser().ScreenName
 
+    let commandToReply indicator (countries:Countries.Country seq) startValue endValue = async {
+        match indicator with
+        | Command.IndicatorFun.WB ifun ->
+            let countries =
+                countries 
+                |> Seq.map Data.toWBCountry 
+                |> Seq.filter Option.isSome
+                |> Seq.map Option.get
+                |> Seq.toList
+            
+            let title = 
+                let country =
+                    countries
+                    |> Seq.head
+                    |> ifun
+                country.Name
+                
+            let indicators =
+                countries
+                |> Seq.map ( fun country ->
+                    let i = ifun country |> Seq.map (fun (x,y) ->  (double x, double y) ) 
+                    country.Name, i
+                )
+            return seq { yield Graph.Line title indicators startValue endValue false false }
+                
+        | Command.IndicatorFun.Covid ifun ->
+            let! indicators =
+                countries
+                    |> Seq.map (fun country ->
+                        country |> ifun
+                    )
+                    |> Async.Parallel
+            let deaths = indicators |> Seq.map (fun country -> country.Name, country.Deaths)
+            let confirmed = indicators |> Seq.map (fun country -> country.Name, country.Confirmed)
+            let recovered = indicators |> Seq.map (fun country -> country.Name, country.Recovered)
+            return seq {
+                yield Graph.Line "Covid-19 - Deaths" deaths None None true true
+                yield Graph.Line "Covid-19 - Confirmed" confirmed None None true true
+                yield Graph.Line "Covid-19 - Recovered" recovered None None true true
+            }
+    }
+
     let execute (commands:Command.Command list) = async {
-        let! images =
+        let! replies =
             commands
             |> Seq.map ( fun command -> async {
-                let line = Graph.Line command
-                let upload = Upload.UploadBinary( line.ToArray() )
-                return upload
+                let! lines = commandToReply (command.Indicator) (command.Countries) (command.StartYear) (command.EndYear)
+                return lines
+                   |> Seq.map (fun line -> Upload.UploadBinary( line.ToArray()))
+                   |> Seq.chunkBySize 4
+                   |> Seq.map (ResizeArray)
+                   |> Seq.map (fun medias -> PublishTweetOptionalParameters(Medias = medias))
             })
             |> Async.Parallel
-        return PublishTweetOptionalParameters(Medias = ResizeArray(images))
+        return replies |> Seq.concat
     }
         
     let reply (mentions: IMention seq) = async { 
@@ -50,23 +95,32 @@ type FeedReader() =
             mentions
             |> Seq.filter (fun mention -> not (isNull mention.Text))
             |> Seq.map ( fun mention ->
+
+                printfn "replying to %s | %s" mention.CreatedBy.ScreenName mention.Text
+                
                 let commands =
                     mention.Text.ToLowerInvariant()
                     |> Command.Parse
                     |> List.chunkBySize 4
                 commands, mention.Id, mention.CreatedBy.ScreenName
             )
-            |> Seq.map (fun (commands, mentionId, userHandle) ->
-                    commands
-                    |> List.map ( fun command -> async {
-                        let! reply = command |> execute
-                        reply.InReplyToTweetId <- Nullable(mentionId)
-                        return TweetAsync.PublishTweet(sprintf "@%s" userHandle, reply)
-                    })
-                    |> Async.Parallel
-            )
+            |> Seq.map (fun (commands, mentionId, userHandle) -> async {
+                    let! replies = commands |> List.map execute |> Async.Sequential
+                    return 
+                        replies
+                        |> Seq.concat
+                        |> Seq.map (fun reply -> reply, mentionId, userHandle)
+            })
             |> Async.Parallel
-        return replies |> Seq.collect id
+
+        return! 
+            replies 
+            |> Seq.concat
+            |> Seq.map(fun (reply, mentionId, userHandle) ->
+                reply.InReplyToTweetId <- Nullable(mentionId)
+                TweetAsync.PublishTweet(sprintf "@%s" userHandle, reply) |> Async.AwaitTask
+            ) 
+            |> Async.Parallel
     }
                 
     let start () = async {
@@ -77,7 +131,7 @@ type FeedReader() =
             | Some mention -> 
                 let parameters = MentionsTimelineParameters()
                 parameters.SinceId <- mention.Id
-                parameters.MaximumNumberOfTweetsToRetrieve <- 100
+                parameters.MaximumNumberOfTweetsToRetrieve <- 1
                 Timeline.GetMentionsTimeline(parameters) |> Option.ofObj
             | None -> Timeline.GetMentionsTimeline() |> Option.ofObj
         

@@ -4,22 +4,22 @@ open Data
 
 type IndicatorFun = 
 | WB of (WBCountry -> WBIndicator)
-| Covid of (string->Async<CovidProvider.CovidIndicator>)
+| Covid of (Countries.Country->Async<CovidProvider.CovidIndicator>)
 
 type Token =
-| Country of WBCountry
+| Country of Countries.Country
 | Indicator of IndicatorFun
 | Year of int
 | Unknown
 
 type FoldState = {
-    Country : WBCountry list
+    Country : Countries.Country list
     Indicator : IndicatorFun list
     Year : int list
 }
 
 type Command = {
-    Countries : WBCountry list
+    Countries : Countries.Country list
     Indicator : IndicatorFun 
     StartYear : int option
     EndYear : int option
@@ -47,7 +47,7 @@ let Parse (commandLine:string)  =
     
     let folder (state: FoldState) (token:Token) =
         match token with
-        | Token.Country c ->  { state with Country = state.Country @ [c]  }
+        | Token.Country c -> { state with Country = state.Country @ [c]  }
         | Token.Indicator i -> { state with Indicator = state.Indicator @ [i] }
         | Token.Year y -> { state with Year = state.Year @ [y] }
         | _ -> state

@@ -28,14 +28,14 @@ let createPane (title: string) =
     pane.XAxis.Scale.MaxGrace <- 0.0
     pane
 
-let pointList (startDate:int option) (endDate:int option) indicator = 
+let pointList (startValue:int option) (endValue:int option) indicator = 
     let points = PointPairList()
     
     let dateFilter = 
-        match startDate, endDate with
-        | Some sd, Some ed -> fun (year, _) -> year >= double sd && year <= double ed
-        | Some sd, None -> fun (year, _) -> year >= double sd
-        | None, Some ed -> fun (year, _) -> year <= double ed
+        match startValue, endValue with
+        | Some sd, Some ed -> fun (value, _) -> value >= double sd && value <= double ed
+        | Some sd, None -> fun (value, _) -> value >= double sd
+        | None, Some ed -> fun (value, _) -> value <= double ed
         | None, None -> fun (_) -> true
 
     for (year, value) in (indicator |> Seq.filter dateFilter ) do
@@ -61,9 +61,11 @@ let paneToStream (pane:GraphPane) =
     bmp.Save(stream, Imaging.ImageFormat.Png)
     stream
 
-let Line title indicators =
+let Line title indicators startValue endValue isDate isLog =
     let pane = createPane(title)
-    let addLine = addLineToPane None None pane
+    if isDate then pane.XAxis.Type <- AxisType.Date
+    if isLog then pane.YAxis.Type <- AxisType.Log
+    let addLine = addLineToPane startValue endValue pane
     for legend, indicator in indicators do
         addLine legend indicator
     pane |> paneToStream
