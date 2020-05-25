@@ -39,10 +39,18 @@ let (|IndicatorMatcher|_|) (key: string) =
         Some (fun (c:WBCountry) -> c.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``)
     | "employment" -> 
         Some (fun (c:WBCountry) -> c.Indicators.``Employers, total (% of total employment) (modeled ILO estimate)``)
-    | "unenployment" -> 
+    | "unemployment" -> 
         Some (fun (c:WBCountry) -> c.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)``)
     | "electricity-access" ->
         Some (fun (c:WBCountry) -> c.Indicators.``Access to electricity (% of population)``)
+    | "exchange-rate/usd" ->
+        Some (fun (c:WBCountry) -> c.Indicators.``Official exchange rate (LCU per US$, period average)``)
+    | "poverty-gap" ->
+        Some (fun (c:WBCountry) -> c.Indicators.``Poverty headcount ratio at national poverty lines (% of population)``)
+    | "stock-market" ->
+        Some (fun (c:WBCountry) -> c.Indicators.``Stocks traded, total value (current US$)``)
+    | "external-balance" ->
+        Some (fun (c:WBCountry) -> c.Indicators.``External balance on goods and services (current US$)``)
     |_ -> None
 
 let (|YearMatcher|_|) (token:string) =
