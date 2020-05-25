@@ -1,6 +1,7 @@
 ﻿module Command
 
 open Data
+open System.Text.RegularExpressions
 
 type IndicatorFun = 
 | WB of (WBCountry -> WBIndicator)
@@ -40,7 +41,7 @@ let parse (token:string) =
 
 let Parse (commandLine:string)  = 
     let tokens = 
-        commandLine.Split(" ") 
+        Regex.Split(commandLine, "\s") 
         |> Set.ofArray 
         |> Set.toList
         |> List.map parse
