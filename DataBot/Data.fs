@@ -38,7 +38,7 @@ let (|IndicatorMatcher|_|) (key: string) =
     | "literacy/adult" -> 
         Some (fun (c:WBCountry) -> c.Indicators.``Literacy rate, adult total (% of people ages 15 and above)``)
     | "employment" -> 
-        Some (fun (c:WBCountry) -> c.Indicators.``Employers, total (% of total employment) (modeled ILO estimate)``)
+        Some (fun (c:WBCountry) -> c.Indicators.``Employment to population ratio, 15+, total (%) (national estimate)``)
     | "unemployment" -> 
         Some (fun (c:WBCountry) -> c.Indicators.``Unemployment, total (% of total labor force) (modeled ILO estimate)``)
     | "electricity-access" ->
