@@ -131,7 +131,7 @@ type FeedReader() =
             | Some mention -> 
                 let parameters = MentionsTimelineParameters()
                 parameters.SinceId <- mention.Id
-                parameters.MaximumNumberOfTweetsToRetrieve <- 1
+                parameters.MaximumNumberOfTweetsToRetrieve <- 100
                 Timeline.GetMentionsTimeline(parameters) |> Option.ofObj
             | None -> Timeline.GetMentionsTimeline() |> Option.ofObj
         
