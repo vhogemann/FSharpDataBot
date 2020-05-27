@@ -1,0 +1,8 @@
+language: csharp
+mono: none
+dist: xenial
+install: 
+  - dotnet restore
+script: 
+  - dotnet build
+  - dotnet test Tests/Tests.fsproj
