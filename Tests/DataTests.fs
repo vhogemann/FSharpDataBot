@@ -9,23 +9,11 @@ let ``Country Matcher`` () =
 
     test 
         <@ 
-            match "bra" with
-            | CoutryMatcher country ->
-                country.Name = "Brazil"
+            match "brazil" with
+            | CountryMatcher country ->
+                country.TwoLetterCode = "br"
             | _ -> false
         @>
-    
-    let maybeUsa =
-        match "united states" with
-            | CoutryMatcher country ->
-                Some country;
-            | _ -> None
-    
-    test 
-        <@ 
-            maybeUsa.IsSome            
-        @>
-
 [<Fact>]
 let ``Year Matcher`` () =
     test

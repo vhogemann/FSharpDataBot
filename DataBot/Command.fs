@@ -30,7 +30,7 @@ let parse (token:string) =
     match token with
     | IndicatorMatcher indicator ->
         Token.Indicator (WB indicator) 
-    | CoutryMatcher country -> 
+    | CountryMatcher country -> 
         Token.Country country
     | YearMatcher year -> 
         Token.Year year

@@ -9,7 +9,7 @@ let private _c = data.Countries
 type WBCountry = WorldBankData.ServiceTypes.Country
 type WBIndicator = Runtime.WorldBank.Indicator
 
-let (|CoutryMatcher|_|) (key:string) =
+let (|CountryMatcher|_|) (key:string) =
     Countries.List 
     |> List.tryFind (fun region -> 
         region.Name = key
