@@ -5,10 +5,15 @@ open ZedGraph
 type Covid = JsonProvider<"covidsample.json", SampleIsList=true>
 
 
+let folder (state: (double*double) list) (current:double*double): (double*double) list =
+    List.empty
+
 type CovidIndicator (code:string, name:string, values:Covid.Root[]) =
     member __.Name = name
     member __.Code = code
     member __.Deaths = values |> Seq.map (fun value -> (double (value.Date.DateTime |> XDate), double value.Deaths))
+    member this.NewDeaths =
+        this.Deaths
     member __.Confirmed = values |> Seq.map (fun value -> (double (value.Date.DateTime |> XDate), double value.Confirmed))
     member __.Recovered = values |> Seq.map (fun value -> (double (value.Date.DateTime |> XDate), double value.Recovered))
 
