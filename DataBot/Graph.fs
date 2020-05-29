@@ -61,10 +61,11 @@ let paneToStream (pane:GraphPane) =
     bmp.Save(stream, Imaging.ImageFormat.Png)
     stream
 
-let Line title indicators startValue endValue isDate isLog =
+let Line title indicators startValue endValue isDate isLogX isLogY =
     let pane = createPane(title)
     if isDate then pane.XAxis.Type <- AxisType.Date
-    if isLog then pane.YAxis.Type <- AxisType.Log
+    if isLogY then pane.YAxis.Type <- AxisType.Log
+    if isLogX then pane.XAxis.Type <- AxisType.Log
     let addLine = addLineToPane startValue endValue pane
     for legend, indicator in indicators do
         addLine legend indicator

@@ -56,7 +56,7 @@ type FeedReader() =
                     let i = ifun country |> Seq.map (fun (x,y) ->  (double x, double y) ) 
                     country.Name, i
                 )
-            return seq { yield Graph.Line title indicators startValue endValue false false }
+            return seq { yield Graph.Line title indicators startValue endValue false false false }
                 
         | Command.IndicatorFun.Covid ifun ->
             let! indicators =
@@ -71,11 +71,11 @@ type FeedReader() =
             let confirmedNxT = indicators |> Seq.map (fun country -> country.Name, country.TotalVsNewConfirmed)
             let recovered = indicators |> Seq.map (fun country -> country.Name, country.Recovered)
             return seq {
-                yield Graph.Line "Covid-19 - Deaths" deaths None None true true
-                yield Graph.Line "Covid-10 - New vs Total Deaths" deathsNxT None None true true
-                yield Graph.Line "Covid-19 - Confirmed" confirmed None None true true
-                yield Graph.Line "Covid-19 - New vs Total Confirmed" confirmedNxT None None true true
-                yield Graph.Line "Covid-19 - Recovered" recovered None None true true
+                yield Graph.Line "Covid-19 - Deaths" deaths None None true false true 
+                yield Graph.Line "Covid-10 - New vs Total Deaths" deathsNxT None None false true true
+                yield Graph.Line "Covid-19 - Confirmed" confirmed None None true false true
+                yield Graph.Line "Covid-19 - New vs Total Confirmed" confirmedNxT None None false true true
+                yield Graph.Line "Covid-19 - Recovered" recovered None None true false true
             }
     }
 

@@ -12,13 +12,13 @@ let totalVsNew (total: (double*double) seq) (newCases: (double*double) list) =
     let newValues =
         newCases
         |> Seq.map( fun (_,v) -> v )
-    Seq.zip totalValues newValues
+    Seq.zip newValues totalValues
 
 let folder (state: (double*double) list) (current:double*double): (double*double) list =
     let (_, prev) = state |> List.last    
     let (dt, curr) = current
     let diff = System.Math.Abs( prev - curr )
-    [(dt, diff)] @ state
+    state @ [(dt, diff)]
 
 type CovidIndicator (code:string, name:string, values:Covid.Root[]) =
     member __.Name = name
