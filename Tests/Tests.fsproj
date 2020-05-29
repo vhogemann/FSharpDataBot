@@ -11,6 +11,9 @@
     <Compile Include="DataTests.fs" />
     <Compile Include="GraphTests.fs" />
     <Compile Include="Program.fs" />
+    <Content Include="covidsample.json" >
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

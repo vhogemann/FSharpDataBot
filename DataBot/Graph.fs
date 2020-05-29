@@ -57,12 +57,20 @@ let paneToStream (pane:GraphPane) =
     pane.AxisChange(graph)
     graph.Dispose()
     use bmp = pane.GetImage()
-    use stream = new MemoryStream()
+    let stream = new MemoryStream()
     bmp.Save(stream, Imaging.ImageFormat.Png)
     stream
 
 let Line title indicators startValue endValue isDate isLogX isLogY =
     let pane = createPane(title)
+    pane.XAxis.MinorGrid.IsVisible <- true
+    pane.XAxis.MajorGrid.IsVisible <- true
+    pane.XAxis.MajorGrid.DashOff <- 0.0f
+    pane.XAxis.MajorGrid.Color <- Color.Gray
+    pane.YAxis.MajorGrid.IsVisible <- true
+    pane.YAxis.MinorGrid.IsVisible <- true
+    pane.YAxis.MajorGrid.DashOff <- 0.0f
+    pane.YAxis.MajorGrid.Color <-Color.Gray
     if isDate then pane.XAxis.Type <- AxisType.Date
     if isLogY then pane.YAxis.Type <- AxisType.Log
     if isLogX then pane.XAxis.Type <- AxisType.Log
