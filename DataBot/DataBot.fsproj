@@ -11,12 +11,14 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="3.1.0" />
+    <PackageReference Include="Unicode.net" Version="0.1.2" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="covidsample.json" />
     <Compile Include="CovidProvider.fs" />
     <Compile Include="MentionsRepository.fs" />
     <Compile Include="Countries.fs" />
+    <Compile Include="Model.fs" />
     <Compile Include="Data.fs" />
     <Compile Include="Command.fs" />
     <Compile Include="Graph.fs" />
