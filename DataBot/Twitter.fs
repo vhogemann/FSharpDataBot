@@ -33,7 +33,7 @@ type FeedReader() =
         TweetinviConfig.CurrentThreadSettings.TweetMode <- TweetMode.Extended
     let botUser = User.GetAuthenticatedUser().ScreenName
 
-    let commandToReply indicator (countries:Countries.Country seq) startValue endValue = async {
+    let commandToReply indicator (countries:Countries.CountryId seq) startValue endValue = async {
         match indicator with
         | Command.IndicatorFun.WB ifun ->
             let countries =

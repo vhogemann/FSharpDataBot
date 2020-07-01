@@ -10,20 +10,20 @@ type WBCountry = WorldBankData.ServiceTypes.Country
 type WBIndicator = Runtime.WorldBank.Indicator
 
 let (|CountryMatcher|_|) (key:string) =
-    Countries.List 
+    Countries.CountryIdList 
     |> List.tryFind (fun region -> 
         region.Name = key
         || region.ThreeLetterCode = key
         || region.TwoLetterCode = key
     )
 
-let toWBCountry (region:Countries.Country) =
+let toWBCountry (region:Countries.CountryId) =
     _c |> Seq.tryFind (fun country -> country.Code = region.ThreeLetterCode.ToUpper()) 
     
 
 let (|CovidMatcher|_|) (key: string) =
     match key with
-    | "covid" -> Some (fun (country:Countries.Country) -> 
+    | "covid" -> Some (fun (country:Countries.CountryId) -> 
         CovidProvider.AsyncFetch (country.TwoLetterCode) (country.ThreeLetterCode.ToUpper()))
     |_ -> None
 

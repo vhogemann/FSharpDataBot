@@ -1,5 +1,4 @@
 module Graph
-open Command
 open ZedGraph
 open System
 open System.IO

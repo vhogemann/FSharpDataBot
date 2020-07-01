@@ -2,7 +2,7 @@ module Countries
 
 open NeoSmart.Unicode
 
-type Country =
+type CountryId =
     { Name: string
       TwoLetterCode: string
       ThreeLetterCode: string
@@ -14,7 +14,7 @@ let country name two three flag =
       ThreeLetterCode = three
       Emoji = flag }
 
-let List =
+let CountryIdList =
     [ country "afghanistan" "af" "afg" Emoji.Afghanistan
       country "albania" "al" "alb" Emoji.Albania
       country "algeria" "dz" "dza" Emoji.Algeria

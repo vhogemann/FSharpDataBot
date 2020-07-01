@@ -20,7 +20,6 @@
     <Compile Include="Countries.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="Data.fs" />
-    <Compile Include="Command.fs" />
     <Compile Include="Graph.fs" />
     <Compile Include="Twitter.fs" />
     <Compile Include="Program.fs" />
