@@ -1,5 +1,4 @@
 module Graph
-open Command
 open ZedGraph
 open System
 open System.IO
@@ -9,16 +8,18 @@ open FSharp.Data
 type Indicator = Runtime.WorldBank.Indicator
 type ValueSeq<'X,'Y> = ('X*'Y) seq
 
-let stringToColorHex (str:string):string =
-    if( String.IsNullOrEmpty str ) then
-        "#eeeeee"
-    else
-        let hash = str.GetHashCode() &&& 0x00FFFFFF
-        sprintf "#%X" hash
-
-let StringToColor (str:string):Color = 
-    str |> stringToColorHex |> ColorTranslator.FromHtml
-    
+let indexToColor (i:int):Color =
+    let Pallete = [|
+        "#003f5c"
+        "#2f4b7c"
+        "#665191"
+        "#a05195"
+        "#d45087"
+        "#f95d6a"
+        "#ff7c43"
+        "#ffa600"
+    |]
+    ColorTranslator.FromHtml <| Pallete.[ i % Pallete.Length ]  
 
 let createPane (title: string) =
     let pane = GraphPane()
@@ -43,14 +44,13 @@ let pointList (startValue:int option) (endValue:int option) indicator =
     
     points
 
-let addLineToPane  (startDate:int option) (endDate:int option) (pane:GraphPane) code indicator  =
+let addLineToPane (startDate:int option) (endDate:int option) (pane:GraphPane) code indicator idx  =
     let points = pointList startDate endDate indicator
-    let color = code |> StringToColor
-    let curve = pane.AddCurve(code, points, color, SymbolType.None)
+    let curve = pane.AddCurve(code, points, indexToColor idx, SymbolType.None)
     curve.Line.IsSmooth <- true
     curve.Line.IsAntiAlias <- true
     curve.Line.Width <- 3.0f
-    ()
+    curve
 
 let paneToStream (pane:GraphPane) =
     use graph = Graphics.FromImage(new Bitmap(1200, 675))
@@ -70,13 +70,16 @@ let Line title indicators startValue endValue isDate isLogX isLogY =
     pane.YAxis.MajorGrid.IsVisible <- true
     pane.YAxis.MinorGrid.IsVisible <- true
     pane.YAxis.MajorGrid.DashOff <- 0.0f
-    pane.YAxis.MajorGrid.Color <-Color.Gray
+    pane.YAxis.MajorGrid.Color <- Color.Gray
+    pane.YAxis.Scale.IsUseTenPower <- false
     if isDate then pane.XAxis.Type <- AxisType.Date
     if isLogY then pane.YAxis.Type <- AxisType.Log
     if isLogX then pane.XAxis.Type <- AxisType.Log
     let addLine = addLineToPane startValue endValue pane
-    for legend, indicator in indicators do
-        addLine legend indicator
+    
+    indicators
+    |> Seq.iteri( fun idx (legend, indicator) -> addLine legend indicator idx |> ignore )
+    
     pane |> paneToStream
 
 

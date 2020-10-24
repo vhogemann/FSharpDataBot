@@ -19,7 +19,6 @@ let totalVsNew (total: (double*double) seq) (newCases: (double*double) list) =
 let folder (state: (double*double) list) (current:double*double): (double*double) list =
     let (_, prev) = state |> List.last    
     let (dt, curr) = current
-    let diff = System.Math.Abs( prev - curr )
     state @ [(dt, curr)]
 
 type CovidIndicator (code:string, name:string, values:Covid.Root[]) =
