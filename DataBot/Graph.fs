@@ -31,7 +31,7 @@ let indexToColor (i:int):Color =
         "#f79302"
         "#544516"
     |]
-    ColorTranslator.FromHtml <| Pallete.[ i % Pallete.Length ]  
+    ColorTranslator.FromHtml <| Pallete.[ i % Pallete.Length ]
 
 let createPane (title: string) =
     let pane = GraphPane()
