@@ -10,14 +10,26 @@ type ValueSeq<'X,'Y> = ('X*'Y) seq
 
 let indexToColor (i:int):Color =
     let Pallete = [|
-        "#003f5c"
-        "#2f4b7c"
-        "#665191"
-        "#a05195"
-        "#d45087"
-        "#f95d6a"
-        "#ff7c43"
-        "#ffa600"
+        "#a0e85b"
+        "#572b9e"
+        "#b6c5f5"
+        "#22577a"
+        "#a2e1ca"
+        "#096013"
+        "#1eefc9"
+        "#7d2b22"
+        "#fad139"
+        "#fd2c3b"
+        "#42a359"
+        "#11a0aa"
+        "#f27ff5"
+        "#b41270"
+        "#8f77c0"
+        "#8d12dc"
+        "#51f310"
+        "#d47767"
+        "#f79302"
+        "#544516"
     |]
     ColorTranslator.FromHtml <| Pallete.[ i % Pallete.Length ]  
 
