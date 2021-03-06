@@ -5,7 +5,7 @@ open System.Text.RegularExpressions
 
 type IndicatorFun = 
 | WB of (WBCountry -> WBIndicator)
-| Covid of (Countries.Country->Async<CovidProvider.CovidIndicator>)
+| Covid of (Countries.Country->Async<CovidProvider.CovidIndicator option>)
 
 type Token =
 | Country of Countries.Country

@@ -37,6 +37,11 @@ type CovidIndicator (code:string, name:string, values:Covid.Root[]) =
 let AsyncFetch code name=
     let baseUrl = sprintf "https://api.covid19api.com/total/dayone/country/%s" code
     async {
-        let! json = Http.AsyncRequestString baseUrl
-        return CovidIndicator( code, name, Covid.ParseList json)
+        let! response = Http.AsyncRequestString baseUrl |> Async.Catch
+        return
+            match response with
+            | Choice1Of2 json ->
+                CovidIndicator( code, name, Covid.ParseList json) |> Some
+            | Choice2Of2 _ ->
+                None
     }
