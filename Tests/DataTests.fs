@@ -14,6 +14,23 @@ let ``Country Matcher`` () =
                 country.TwoLetterCode = "br"
             | _ -> false
         @>
+    
+    test
+        <@
+            match "brasil" with
+            | CountryMatcher country ->
+                country.TwoLetterCode = "br"
+            | _ -> false
+        @>
+    
+    // Lots of people use UK instead of the correct GB code
+    test
+        <@
+            match "uk" with
+            | CountryMatcher country ->
+                country.TwoLetterCode = "gb"
+            | _ -> false
+        @>
 [<Fact>]
 let ``Year Matcher`` () =
     test
