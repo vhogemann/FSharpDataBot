@@ -7,15 +7,30 @@ type [<CLIMutable>] MentionEntry = {
     TimeStamp: DateTime
 }
 
-type MentionContext () =
+type SqliteMentionContext (useSqlite, accountEndpoint, accountKey, databaseName) =
     inherit DbContext()
     [<DefaultValue>]
     val mutable mentions: DbSet<MentionEntry>
     member public this.Mentions with  get() = this.mentions and set m = this.mentions <- m
-    override __.OnConfiguring optionsBuilder =
-        optionsBuilder.UseSqlite("Data Source=mentions.db") |> ignore
+    override _.OnConfiguring optionsBuilder =
+        if useSqlite then
+            optionsBuilder.UseSqlite("Data Source=mentions.db") |> ignore
+        else
+            optionsBuilder.UseCosmos(accountEndpoint, accountKey, databaseName) |> ignore
 
-let db = new MentionContext()
+
+let db =
+    let getEnv = Environment.GetEnvironmentVariable
+    let useSQLite =
+        match "USE_SQL_LITE" |> getEnv with
+        | null -> false
+        | s -> s |> bool.Parse
+    let accountEndpoint = "COSMOS_DB_ACCOUNT_ENDPOINT" |> getEnv
+    let accountKey = "COSMOS_DB_ACCOUNT_KEY" |> getEnv
+    let databaseName = "COSMOS_DB_DATABASE_NAME" |> getEnv
+    
+    new SqliteMentionContext(useSQLite, accountEndpoint, accountKey, databaseName)
+    
 db.Database.EnsureCreated() |> ignore
 
 let SaveMentions mentions =

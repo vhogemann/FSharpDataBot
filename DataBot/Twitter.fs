@@ -148,7 +148,7 @@ type FeedReader() =
             return ()
     }
 
-    member __.Start () = async {
+    member _.Start () = async {
             while true do
                 do! start()
                 do! Async.Sleep (1000 * 60)
