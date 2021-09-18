@@ -213,7 +213,7 @@ let List =
       country "seychelles" "sc" "syc"
       country "sierra leone" "sl" "sle"
       country "singapore" "sg" "sgp"
-      country "sint maarten" "sx" "sxm"
+      country "saint maarten" "sx" "sxm"
       country "slovakia" "sk" "svk"
       country "slovenia" "si" "svn"
       country "solomon islands" "sb" "slb"
