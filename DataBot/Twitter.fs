@@ -100,8 +100,13 @@ type FeedReader() =
 
                 printfn "replying to %s | %s" mention.CreatedBy.ScreenName mention.Text
                 
+                let index = mention.Text.IndexOf(botUser)
+                
+                // Just use the part from "@botUser" onward...
+                let mentionText = mention.Text.Substring(index);
+                
                 let commands =
-                    mention.Text.ToLowerInvariant()
+                    mentionText.ToLowerInvariant()
                     |> Command.Parse
                     |> List.chunkBySize 4
                 commands, mention.Id, mention.CreatedBy.ScreenName

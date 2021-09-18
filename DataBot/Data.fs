@@ -33,6 +33,8 @@ let (|IndicatorMatcher|_|) (key: string) =
         Some (fun (c:WBCountry) -> c.Indicators.``GDP (current US$)``)
     | "gdp/capita" -> 
         Some (fun (c:WBCountry) -> c.Indicators.``GDP per capita (current US$)``)
+    | "gdp/growth" ->
+        Some (fun (c:WBCountry) -> c.Indicators.``GDP growth (annual %)``)
     | "literacy" | "literacy/young" ->
         Some (fun (c:WBCountry) -> c.Indicators.``Literacy rate, youth total (% of people ages 15-24)``)
     | "literacy/adult" -> 

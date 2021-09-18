@@ -35,6 +35,7 @@ Indicator | Description
 --------- | -----------
 gdp | Gross Domestic Product in USD
 gdp/capita | Gross Domestic Product per Capita in USD
+gdp/growth | Gross Domestic Product annual growth %
 literacy | Literacy rate, youth total (% of people ages 15-24)
 literacy/young | Same as above
 literacy/adult | Literacy rate, adult total (% of people ages 15 and above)
