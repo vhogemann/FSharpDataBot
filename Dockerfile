@@ -10,10 +10,14 @@ RUN apt-get install -y dotnet-sdk-3.1
 RUN apt-get install -y libgdiplus
 WORKDIR /app
 
-FROM base as build
+FROM base as restore
+WORKDIR /src
+COPY ["DataBot/DataBot.fsproj", "DataBot/"]
+RUN dotnet restore "DataBot/DataBot.fsproj"
+
+FROM restore as build
 WORKDIR /src
 COPY . .
-RUN dotnet restore "DataBot.sln"
 RUN dotnet build "DataBot/DataBot.fsproj" -c Release -o /app/build
 
 FROM build as publish
